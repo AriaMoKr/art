@@ -1,7 +1,7 @@
 {
   "name": "art",
   "version": "0.1.0",
-  "description": "An empty WebXR room behind the Hallway's door, soon a gallery of art: a floor, four walls, a ceiling, a window onto the afternoon sky, and the doorway back. In VR, on a desktop or on a phone.",
+  "description": "A WebXR room behind the Hallway's door, soon a gallery of art: a floor, four walls, a ceiling, a window onto the afternoon sky, the doorway back, and on the wall the way into VARTISTE's painting studio. In VR, on a desktop or on a phone.",
   "keywords": ["webxr", "virtual-reality", "threejs", "meta-quest", "art", "gallery"],
   "homepage": "https://ariamokr.github.io/art/",
   "repository": {
@@ -25,7 +25,7 @@
     "preview": "node tools/preview.mjs"
   },
   "dependencies": {
-    "common": "github:AriaMoKr/common#v0.6.2",
+    "common": "github:AriaMoKr/common#v0.6.3",
     "layersharedsession": "github:AriaMoKr/layersharedsession#v0.3.0",
     "three": "0.186.1",
     "trystero": "0.26.0"

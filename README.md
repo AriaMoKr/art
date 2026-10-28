@@ -2,19 +2,20 @@
 
 **https://ariamokr.github.io/art/**
 
-An empty room behind the [Hallway](https://ariamokr.github.io/hallway/)'s door, soon a gallery of
-art. For now it is the room [AriaMoKr/RoomTemplateEmpty](https://github.com/AriaMoKr/RoomTemplateEmpty)
-makes, and nothing more: a floor, four walls, a ceiling with its lamps, a window onto the afternoon
-sky, and the doorway back to the Hallway. The window is in the right-hand wall, with the sun behind
-the room, so its light is a painter's north light. Walk it in VR on a Meta Quest, on a desktop or on
-a phone. There is nothing to install.
+A room behind the [Hallway](https://ariamokr.github.io/hallway/)'s door, soon a gallery of art. It is
+the room [AriaMoKr/RoomTemplateEmpty](https://github.com/AriaMoKr/RoomTemplateEmpty) makes (a floor,
+four walls, a ceiling with its lamps, a window onto the afternoon sky, and the doorway back to the
+Hallway) with one thing on its walls so far: across from the window, a framed picture of
+[VARTISTE](https://ariamokr.github.io/vartiste/)'s studio, the way into it. The window is in the
+right-hand wall, with the sun behind the room, so its light is a painter's north light. Walk it in
+VR on a Meta Quest, on a desktop or on a phone. There is nothing to install.
 
 ![The room as one comes in through the door](public/hallway-preview.jpg)
 
 Behind you as you come in is the doorway you came through, glowing rose, with the Hallway seen
 through it. Walk back through it (or click or tap it, or point at it in VR and pull the trigger) and
 you are back in the Hallway, in front of this room's door. Beside it, on the wall, is the control
-panel.
+panel. On the left-hand wall, across from the window, hangs VARTISTE (below, "On the walls").
 
 ## Moving about
 
@@ -27,6 +28,9 @@ As in the Hallway:
 | Headset | your head | left stick walks (or aims a teleport), right stick turns, trigger at the floor teleports | trigger (or pinch) at the doorway, or step through it | squeeze a grip |
 | Gamepad | right stick | left stick (click it in to hurry) | aim the dot at the doorway and press A, or walk into it | the **Wave** button |
 | TV remote (below, "On a TV") | ←/→ turn | ↑/↓ | the dot on the doorway and OK, or walk into it; or Back | **Wave** in the card (Menu) |
+
+Whatever hangs on the walls (below, "On the walls") is chosen as the doorway is: you walk up to it,
+and on through it when it leads somewhere.
 
 The walls stop you. **Fullscreen** and **Enter VR** are at the bottom right (not on a TV). The **control panel**
 by the doorway holds Enter or exit VR, how to move and turn in VR (Smooth or Teleport, Snap or
@@ -73,7 +77,7 @@ the Hallway, the doorway shows its glow and the name of where it leads.
 
 ## The Hallway's door
 
-The Hallway does not have a door to here yet. Its entry for the Hallway's
+The Hallway has a door to here. Its entry in the Hallway's
 [`public/js/environments.js`](https://github.com/AriaMoKr/hallway/blob/main/public/js/environments.js)
 is the config's `hallwayDoor()`:
 
@@ -81,7 +85,7 @@ is the config's `hallwayDoor()`:
 {
   id: 'art',
   title: 'art',
-  subtitle: "An empty room behind the Hallway's door, soon a gallery of art.",
+  subtitle: "A room behind the Hallway's door, soon a gallery of art, with the way into VARTISTE's painting studio on its wall.",
   sign: 'Art Room',
   url: 'https://ariamokr.github.io/art/',
   preview: 'https://ariamokr.github.io/art/hallway-preview.jpg',
@@ -90,8 +94,9 @@ is the config's `hallwayDoor()`:
 ```
 
 As the Hallway's README asks ("Adding a door"), the title on the plaque by the door is the
-repository's name and the subtitle is the page's description word for word. Once the door is there
-and the Hallway has rendered its `views/` again, the doorway back here shows the hall.
+repository's name and the subtitle is the page's description word for word, so when the
+description changes, the Hallway's entry changes with it. Once the Hallway has rendered its `views/`
+with the door, the doorway back here shows the hall.
 
 ## Together
 
@@ -102,6 +107,29 @@ session**, on the panel or in the card, starts one here; **Copy invite link** co
 its address (on a TV the card shows it, to open on a phone or a computer), **Wave** (or a grip in
 VR) waves to everyone in it, and the card has your name in it, to change. The doorway back carries
 the session into the Hallway.
+
+## On the walls
+
+What hangs on the walls is in the config, `pieces`. So far there is one: on the left-hand wall,
+across from the window, a framed picture of VARTISTE's studio, labelled **VARTISTE →**. It is the way
+into [VARTISTE](https://ariamokr.github.io/vartiste/), Zach Capalbo's painting app for VR and the
+screen, as AriaMoKr's fork ([AriaMoKr/vartiste](https://github.com/AriaMoKr/vartiste)) publishes it.
+Choose it (click or tap it, point at it in VR and pull the trigger, or put the dot on it and press A
+or OK) and you walk up to it, the room fades, and VARTISTE opens; in VR, or with less motion, at
+once. The card lists it under **On the walls**, as a link.
+
+VARTISTE gets the way back on its address (common's `hallLink`: `back`, this room at `?from=studio`,
+and `backname=art`). Its **← art**, on the page and as Back to art in VR, brings you back to stand
+in front of the picture, facing into the room, with the doorway still leading where it did. In VR on
+a Quest, the browser hands VARTISTE the immersive session as it hands the Hallway's rooms theirs,
+since both are on `ariamokr.github.io`.
+
+Each piece is a framed picture with its title on a label under it, and may lead somewhere; the
+template's README ("On the walls") has the fields. The pictures are in `public/gallery/`:
+`vartiste.jpg` is VARTISTE's studio as it opens, 1280 × 720, taken in headless Chrome through
+common's `tools/chrome.mjs`. `npm test` checks that each piece fits on its wall, clear of the window
+and the others. The frames and the labels cost nothing more per piece, but each picture is a draw
+call and a texture of its own, against the TV's budget ("On a TV").
 
 ## On a TV
 
@@ -140,11 +168,11 @@ When the art comes in, the gallery keeps the remote working if:
   steps onto a box and past it, and brings it up on OK. Don't give a box `inputmode="none"`.
 - **Nothing needs a keyboard, a pointer or a headset alone**, and there are no local-file controls.
 - **It stays within the frame budget.** On the TV the template was measured on (a Sony BRAVIA 4K
-  VH21: Android 12, a Mali-G52, WebView 155), its empty room, which this one still is, holds 60 fps
-  at 1080p at a pixel ratio of 2: 241 frames, none dropped, the 95th percentile at 16.8 ms. On that
-  TV art itself held 59.9 fps, and the remote and TalkBack reach everything in it (HallwayApp's
-  README, "Behind the doors"). That full frame is the budget the pictures and their lights can
-  spend. Check it with HallwayApp's
+  VH21: Android 12, a Mali-G52, WebView 155), its empty room holds 60 fps at 1080p at a pixel ratio
+  of 2: 241 frames, none dropped, the 95th percentile at 16.8 ms. On that TV art, then still empty,
+  held 59.9 fps, and the remote and TalkBack reached everything in it (HallwayApp's README, "Behind
+  the doors"). That full frame is the budget the pictures and their lights can spend; the studio's
+  picture is one draw call and a 1280 × 720 texture of it. Check it with HallwayApp's
   `tools/tv-check.mjs --url https://ariamokr.github.io/art/` (a debug build), and keep it at 60.
 
 ## Running it
@@ -200,8 +228,9 @@ by its README's "Making a room from this template". What makes it this room rath
 is [`public/js/config.js`](public/js/config.js) (the id `art`, its title, description, sign and
 address, the window in the right wall and the sky's yaw, the port 8096, the rose glow), with
 `package.json`, `index.html`, `.claude/launch.json`, the pictures and these notes to match;
-`npm test` checks the page and the package say what the config says. The rest of `public/js/` is
-still the template's, ready to become the gallery.
+`npm test` checks the page and the package say what the config says. What hangs on the walls is in
+the config too (`pieces`), with its pictures in `public/gallery/`; the rest of `public/js/` is still
+the template's, ready to become the gallery.
 
 The template's fixes come here by merging it, as the TV's remote did: art's history starts at the
 template's first commit, so with the template as a remote named `template`
@@ -222,7 +251,7 @@ lockfile again.
 
 `.github/workflows/pages.yml` publishes `public/` to GitHub Pages on every push to `main`, after
 the tests (tsc's check among them), through the sites' workflow in
-[AriaMoKr/common](https://github.com/AriaMoKr/common) (`v0.6.2`, on Node 24). Every URL in the page is relative, so it works under any repository's path.
+[AriaMoKr/common](https://github.com/AriaMoKr/common) (`v0.6.3`, on Node 24). Every URL in the page is relative, so it works under any repository's path.
 
 ## License
 

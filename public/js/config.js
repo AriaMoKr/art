@@ -1,10 +1,11 @@
 // What a room made from this template changes, in one place (README, "Making a room from this
 // template"): its door's id in the Hallway, its name and description, where it is published, its
 // size and colours, the wall its window is in and how the sky turns through it, its dev server's
-// port, and its doorway's glow. index.html says the title and the description again, for link
-// previews (a test keeps them the same). Pure, for the page, the tests and the tools.
+// port, its doorway's glow, and what hangs on its walls. index.html says the title and the
+// description again, for link previews (a test keeps them the same). Pure, for the page, the tests
+// and the tools.
 //
-// What a room adds stays out of here, in the rest of public/js/. One thing to know about: on a TV
+// What else a room adds stays out of here, in the rest of public/js/. One thing to know about: on a TV
 // (README, "On a TV"), the remote's Back while walking goes back a page, to the room's door in the
 // Hallway, unless the room has a step back of its own first (stand up, put a picture back, close a
 // text). An empty room has none; a room with one takes it in main.js's stepBack, which returns true
@@ -17,7 +18,7 @@ export const ROOM = {
   /** Its name: the page's <title> and the card's heading. */
   title: 'art',
   /** The page's <meta name="description">, word for word: the Hallway's plaque by its door shows it. */
-  description: "An empty room behind the Hallway's door, soon a gallery of art.",
+  description: "A room behind the Hallway's door, soon a gallery of art, with the way into VARTISTE's painting studio on its wall.",
   /** What kind of place it is, on the sign over its door in the Hallway. */
   sign: 'Art Room',
   /** Where it is published, on GitHub Pages: https://ariamokr.github.io/<repository>/. */
@@ -41,7 +42,44 @@ export const ROOM = {
   port: 8096,
   /** The doorway's glow when the Hallway's link gives none: the colour of this room's door there. */
   glow: '#e08fb0',
+  /**
+   * What hangs on its walls (README, "On the walls"): framed pictures with their titles under them,
+   * each perhaps a way to another place and back. A test checks they fit. On the left wall, across
+   * from the window, the door to the studio: VARTISTE, AriaMoKr's copy on Pages, whose ← art comes
+   * back here.
+   */
+  pieces: /** @type {Piece[]} */ ([
+    {
+      id: 'studio',
+      wall: 'left',
+      at: 0,
+      y: 1.55,
+      width: 1.28,
+      height: 0.72,
+      image: 'gallery/vartiste.jpg',
+      title: 'VARTISTE',
+      description: 'The studio: VARTISTE, for painting in VR or on a screen. Its ← art comes back here.',
+      link: 'https://ariamokr.github.io/vartiste/',
+    },
+  ]),
 };
+
+/**
+ * Something on a wall: a framed picture, its title on a label under it (over it, hung low), and
+ * with a link, a way to another place: choosing it goes there, and the way back (?from=<id>) comes
+ * back to stand in front of it.
+ * @typedef {object} Piece
+ * @property {string} id its own, 1–32 of a–z, 0–9 and '-', not 'hallway'
+ * @property {'left'|'right'|'far'} wall the wall it hangs on, facing in from the doorway
+ * @property {number} at its middle along the wall, from the wall's middle, to the right facing it (metres)
+ * @property {number} y its middle's height over the floor
+ * @property {number} width the picture's size, the frame round it: at least 0.1
+ * @property {number} height
+ * @property {string} image the picture, by an address relative to the page ('gallery/studio.jpg')
+ * @property {string} title on its label, and in the card's list
+ * @property {string} description what it is, for a screen reader, in the card's list
+ * @property {string} [link] where it leads, an http(s) address: given the way back by common's hallLink
+ */
 
 /** The colours' form, and the ids'. */
 export const HEX = /^#[0-9a-f]{6}$/;
