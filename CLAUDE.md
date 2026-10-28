@@ -33,15 +33,19 @@ git merge template/main
 In a merge, keep art's own: `config.js`'s values (the template's comments may come in),
 `index.html`, `package.json`'s name and description, the two pictures, port 8096 and `main.js`'s
 opening comment (a line the template adds to it may come in). What the template's README adds goes
-into art's README in art's words; the template's checklist and its own door entry stay out. Then
-`npm install` (the template may move common's tag), `npm test`, and check it in a browser.
+into art's README in art's words; the template's checklist and its own door entry stay out. If
+`package.json` or `package-lock.json` conflict, keep art's name and description, take the
+template's dependencies, and let `npm install` make the lockfile again. Then `npm install` (the
+template may move common's tag), `npm test` (tsc's check among the tests), and check it in a
+browser.
 
 ## Commands
 
 ```bash
 npm install          # postinstall: common's tools/vendor.mjs copies what vendor.json lists into public/vendor/ (gitignored)
 npm start            # tools/serve.mjs (common's) on config.js's port, 8096
-npm test             # node --test "test/*.test.js"
+npm test             # node --test "test/*.test.js", tsc's check among them (test/types.test.js)
+npm run types        # tsc -p tsconfig.json alone
 npm run preview      # tools/preview.mjs: public/hallway-preview.jpg and public/social.jpg (headless Chrome)
 ```
 
@@ -53,6 +57,8 @@ Node 22 or newer; CI runs Node 24 (common's Pages workflow). It runs under MSYS2
 - `config.js`: the one module a copy changes (`ROOM`: id, title, description, sign, url, size,
   colors, window, skyYaw, port, glow) and `hallwayDoor()`, the Hallway's door entry it implies.
   `index.html` and `package.json` repeat some of it; `test/config.test.js` keeps them the same.
+  The `@satisfies` line above `ROOM` (outside it, so a copy's merges leave it be) checks the
+  window's wall for tsc.
 - `room.js`: pure (no three, tested in Node). The layout from the config (`layoutRoom`: the doorway,
   shrunk to fit the link's size, the window, the panel, the lamps, the spawn), `doorSpawn`,
   `clampWalk` (the walls, `MARGIN` from them; the doorway between its jambs to its back),
@@ -101,6 +107,14 @@ Node 22 or newer; CI runs Node 24 (common's Pages workflow). It runs under MSYS2
 
 - Client URLs stay relative (tested). Quest 3 is the target: few draw calls, light baked,
   `MeshBasicMaterial`, nothing allocated per frame.
+- Types, with no build: `tsconfig.json` checks `public/js/` from its JSDoc (`allowJs`, `checkJs`,
+  `noEmit`, bundler resolution: three's types from `@types/three`, common's and
+  layersharedsession's from their `.d.ts`), and the page is served as it is, the import map
+  unchanged. `test/types.test.js` runs tsc, so `npm test` and the Pages workflow do, and fails
+  rather than skips without TypeScript. What TypeScript's DOM library leaves out (WebKit's
+  fullscreen names, `window.__room`, `window.roomXrGranted`) is in `types/globals.d.ts`, never
+  served. Not `strict` yet (437 errors with it, nearly all untyped parameters): that comes a file
+  at a time. `tools/` and `test/` wait for `@types/node`.
 - Scripted testing: `window.__room` (THREE, renderer, scene, camera, rig, room, layout, controls,
   overlay, fade, vignette, xrDevice, go, enterVR, together, remote, tv, way, visit, setAccess, access,
   `preview()`, `social()`, `tick(dt, n)`, `ready`). A hidden browser pane gets no animation frames:
@@ -120,7 +134,7 @@ Node 22 or newer; CI runs Node 24 (common's Pages workflow). It runs under MSYS2
   (a localhost URL goes over adb reverse); the empty room holds 60 fps at 1080p at a pixel ratio of
   2, the budget a room's contents can spend. Other sessions may use the same TV: don't restart its
   app under them.
-- Shared packages, pinned by tag in package.json: AriaMoKr/common (`v0.6.1`: the door contract,
+- Shared packages, pinned by tag in package.json: AriaMoKr/common (`v0.6.2`: the door contract,
   nav, access with the vignette, fade, gamepad, portal, sky, tv, and the tools `serve.mjs`,
   `vendor.mjs`, `chrome.mjs`, and the Pages workflow) and AriaMoKr/layersharedsession (`v0.3.0`).
   Change them there, then move the tag here and `npm install`.

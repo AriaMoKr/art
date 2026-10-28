@@ -154,7 +154,8 @@ You need Node.js 22 or newer.
 ```bash
 npm install       # three.js, common, the shared-session layer, Trystero and IWER, copied into public/vendor/ by common's tools/vendor.mjs from vendor.json
 npm start         # http://localhost:8096/
-npm test          # node --test: the config, where you may walk, the way back's address, the vendor list, the page
+npm test          # node --test: the config, where you may walk, the way back's address, the vendor list, the page, and tsc's check of public/js/
+npm run types     # tsc's check alone
 npm run preview   # public/hallway-preview.jpg and public/social.jpg, in headless Chrome
 ```
 
@@ -163,6 +164,12 @@ npm run preview   # public/hallway-preview.jpg and public/social.jpg, in headles
 shows the TV's page (Escape stands in for Back in the card, and `hallwayTV.menu()` in the console
 for Menu). For a Quest or the TV over adb, `adb reverse tcp:8096 tcp:8096` and start the server on
 IPv4 (`npm start -- --host 127.0.0.1`).
+
+`npm test` type-checks `public/js/` with TypeScript, from the modules' JSDoc (`tsconfig.json`:
+`allowJs`, `checkJs`, `noEmit`), against three.js's types and common's and the shared session's.
+Nothing is built: the page is served as it is, and the import map stays. What TypeScript's DOM
+library leaves out is in `types/globals.d.ts`. The check isn't `strict` yet; that comes a file at a
+time, and `tools/` and `test/` come later.
 
 To try the way in and out locally, serve the Hallway's checkout as well (on 8088) and open the room
 as its door would:
@@ -207,13 +214,15 @@ git merge template/main
 
 In a merge, art keeps its own `config.js` values, `index.html`, `package.json`'s name and
 description, the two pictures, the port 8096 and `main.js`'s opening comment, and its README says
-what the template's says in art's words.
+what the template's says in art's words. If `package.json` or `package-lock.json` conflict, art
+keeps its name and description and takes the template's dependencies, and `npm install` makes the
+lockfile again.
 
 ## Publishing
 
 `.github/workflows/pages.yml` publishes `public/` to GitHub Pages on every push to `main`, after
-the tests, through the sites' workflow in [AriaMoKr/common](https://github.com/AriaMoKr/common)
-(`v0.6.1`, on Node 24). Every URL in the page is relative, so it works under any repository's path.
+the tests (tsc's check among them), through the sites' workflow in
+[AriaMoKr/common](https://github.com/AriaMoKr/common) (`v0.6.2`, on Node 24). Every URL in the page is relative, so it works under any repository's path.
 
 ## License
 
