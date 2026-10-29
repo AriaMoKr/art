@@ -32,6 +32,14 @@ const HINTS = {
   tv: 'Arrows: walk and turn · OK: the doorway or the panel in the middle · Menu or hold Back: settings and the shared session\nWith TalkBack: channel up and down walk, rewind and fast-forward turn',
   'tv-card': 'Up, down: from control to control · left, right: a choice · OK: choose · Back: walk again',
 };
+// With something on the walls (config.js's pieces), each names the pictures too.
+const PIECE_HINTS = {
+  ...HINTS,
+  touch: 'Drag to look · tap the floor to walk there, or a picture · tap the doorway to go back',
+  mouse: 'Drag to look around · WASD or arrows to walk · click the floor to walk there, or a picture',
+  gamepad: 'Right stick to look · left stick to walk · A on a picture goes to it, on the doorway goes back',
+  tv: 'Arrows: walk and turn · OK: the doorway, a picture or the panel in the middle · Menu or hold Back: settings and the shared session\nWith TalkBack: channel up and down walk, rewind and fast-forward turn',
+};
 
 export class Overlay {
   /**
@@ -150,18 +158,54 @@ export class Overlay {
       this._placeHint();
     }).observe(this.buttons);
     this._how = 'mouse';
+    this.pieces = pieces;
+    this._hints = pieces.length ? PIECE_HINTS : HINTS;
+    this._aimed = -1; // the piece a TV's dot is on (setAimed)
+    this._aimShown = false; // the hint shown again for it, to fade when the dot leaves
     addEventListener('resize', () => this._placeHint());
   }
 
   /** @param {'mouse'|'touch'|'gamepad'|'tv'|'tv-card'} how */
   setHint(how, seconds = 12) {
     this._how = how;
+    this._aimShown = false;
     this.hint.classList.remove('gone');
     this.hint.removeAttribute('aria-hidden');
-    this.hint.textContent = HINTS[how];
+    this.hint.textContent = this._hintText();
     this._placeHint();
     clearTimeout(this._hintTimer);
     if (seconds) this._hintTimer = setTimeout(() => this.hideHint(), seconds * 1000);
+  }
+
+  /** The hint's words: on a TV with the dot on a piece, its OK says what OK does there, as music's does on the gramophone. */
+  _hintText() {
+    const text = this._hints[this._how];
+    if (this._how !== 'tv' || this._aimed < 0) return text;
+    const p = this.pieces[this._aimed];
+    return text.replace(/OK: [^·]*? · /, `OK: ${p.link ? p.title : `walk up to ${p.title}`} · `);
+  }
+
+  /**
+   * On a TV, walking: the piece the dot is on (its index in config.js's pieces), else -1. The hint
+   * says what OK does there ("OK: <its title>" for one with a link), shown again if it had faded,
+   * and faded again when the dot leaves.
+   */
+  setAimed(i) {
+    if (i === this._aimed) return;
+    this._aimed = i;
+    if (this._how !== 'tv') return;
+    if (i >= 0) {
+      const faded = this._aimShown || this.hint.classList.contains('gone');
+      this.setHint('tv');
+      this._aimShown = faded;
+      return;
+    }
+    this.hint.textContent = this._hintText();
+    this._placeHint();
+    if (this._aimShown) {
+      clearTimeout(this._hintTimer);
+      this.hideHint();
+    }
   }
 
   /**

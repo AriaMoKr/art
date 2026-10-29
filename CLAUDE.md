@@ -49,7 +49,7 @@ browser.
 npm install          # postinstall: common's tools/vendor.mjs copies what vendor.json lists into public/vendor/ (gitignored)
 npm start            # tools/serve.mjs (common's) on config.js's port, 8096
 npm test             # node --test "test/*.test.js", tsc's check among them (test/types.test.js)
-npm run types        # tsc -p tsconfig.json alone
+npm run types        # tsc -p tsconfig.json, then -p tsconfig.strict.json, alone
 npm run preview      # tools/preview.mjs: public/hallway-preview.jpg and public/social.jpg (headless Chrome)
 ```
 
@@ -59,8 +59,8 @@ Node 22 or newer; CI runs Node 24 (common's Pages workflow). It runs under MSYS2
 ## Layout
 
 - `config.js`: the one module a copy changes (`ROOM`: id, title, description, sign, url, size,
-  colors, window, skyYaw, port, glow, pieces, none here, each a `Piece`) and `hallwayDoor()`, the
-  Hallway's door entry it implies.
+  colors, window, skyYaw, port, glow, pieces, here the studio, each a `Piece`) and `hallwayDoor()`,
+  the Hallway's door entry it implies.
   `index.html` and `package.json` repeat some of it; `test/config.test.js` keeps them the same.
   The `@satisfies` line above `ROOM` (outside it, so a copy's merges leave it be) checks the
   window's wall for tsc.
@@ -99,8 +99,11 @@ Node 22 or newer; CI runs Node 24 (common's Pages workflow). It runs under MSYS2
   radio buttons and checkboxes), the hint (`#hint`, kept clear of the buttons, `_placeHint`), Wave,
   Copy invite link, Fullscreen, Enter VR, the aiming dot, and toasts (`role="status"`, polite). With
   `tv`, Wave is in the card and the invite is text there (`inviteText`), and the hints are the
-  remote's (`tv`, `tv-card`). On a TV, a faded hint is `aria-hidden` (out of TalkBack's reading
-  order) but stays the canvas's description (`aria-describedby`). `presence.js`: the session's status and notices in words.
+  remote's (`tv`, `tv-card`). With pieces, the hints name the pictures (`PIECE_HINTS`, else an
+  empty room's `HINTS`), and on a TV `setAimed(i)` (main.js's frame loop, the piece under the dot)
+  makes the hint's OK say what OK does there, as music's does on the gramophone. On a TV, a faded
+  hint is `aria-hidden` (out of TalkBack's reading order) but stays the canvas's description
+  (`aria-describedby`). `presence.js`: the session's status and notices in words.
 - `preview.js`: the two pictures (`renderPreview`, hung as the hallway hangs its doorways', and
   `renderSocial`, from `socialView`).
 - `main.js`: the visit and the way back (common's `door.js`; `<id>.visit` in sessionStorage),
@@ -112,8 +115,8 @@ Node 22 or newer; CI runs Node 24 (common's Pages workflow). It runs under MSYS2
   `access.js`: `applyAccess`, `setAccess`, re-read on `storage` and `pageshow`; the `reduce-motion`
   class on `<html>`), the TV (common's `tv.js`: `tvMode()`, the `tv` class on `<html>`, a `Remote`
   over the card and the canvas with `use` = `controls.useMiddle()` and `step` = `stepBack`, the
-  room's own step back for Back, none in an empty room; `answerApp`; no fullscreen or XR), and the
-  frame loop.
+  room's own step back for Back, none here yet (as in an empty room); `answerApp`; no fullscreen or
+  XR), and the frame loop.
 - `style.css`: the page over the view, and the 10-foot view under `html.tv` (the hallway's: 960 × 540
   at a pixel ratio of 2, 18 px text, 4 px focus rings, the TV's safe margins, the hint and toasts
   beside the card).
@@ -128,8 +131,11 @@ Node 22 or newer; CI runs Node 24 (common's Pages workflow). It runs under MSYS2
   unchanged. `test/types.test.js` runs tsc, so `npm test` and the Pages workflow do, and fails
   rather than skips without TypeScript. What TypeScript's DOM library leaves out (WebKit's
   fullscreen names, `window.__room`, `window.roomXrGranted`) is in `types/globals.d.ts`, never
-  served. Not `strict` yet (437 errors with it, nearly all untyped parameters): that comes a file
-  at a time. `tools/` and `test/` wait for `@types/node`.
+  served. `strict` comes a file at a time: `tsconfig.strict.json` (it, with `strict` on) includes
+  only the files that pass it, `config.js` and `presence.js` so far, and `test/types.test.js` runs
+  it too. A file joins its `include` when a change makes it pass; what an included file imports is
+  checked strictly with it. The rest has a few hundred errors with it, nearly all untyped
+  parameters. `tools/` and `test/` wait for `@types/node`.
 - Scripted testing: `window.__room` (THREE, renderer, scene, camera, rig, room, layout, controls,
   overlay, fade, vignette, xrDevice, go, enterVR, together, remote, tv, way, visit, setAccess, access,
   `preview()`, `social()`, `tick(dt, n)`, `ready`, true once the pieces' pictures have loaded or

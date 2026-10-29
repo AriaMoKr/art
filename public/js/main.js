@@ -478,6 +478,8 @@ function step(dt) {
   room.panel.setHover(controls.hoverPanel);
   // The dot: a gamepad's aim, or on a TV the remote's OK while walking.
   overlay.setAim((controls.padActive || (remote !== null && !remote.inCard)) && !renderer.xr.isPresenting, !!controls.hover);
+  // On a TV, walking, the hint says what OK does with the dot on something on the walls.
+  if (remote) overlay.setAimed(remote.inCard ? -1 : controls.hoverPiece);
   if (!leaving && doorCrossed(L, head.x, head.z)) go();
   fade.update(dt);
 }

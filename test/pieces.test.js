@@ -140,6 +140,47 @@ test('each is on the page too: On the walls, a link where it leads, a button tha
   }
 });
 
+test("the hints name the pictures, and on a TV the dot on one says what OK does there; an empty room's are as they were", async () => {
+  const remove = installDom();
+  try {
+    const { Overlay } = await import('../public/js/overlay.js');
+    const way = { url: 'https://ariamokr.github.io/hallway/?from=x', label: '← Hallway', title: 'Back to the Hallway' };
+    const empty = new Overlay({ ...ROOM, pieces: [] }, way, { tv: true });
+    const o = new Overlay(room(), way, { tv: true });
+    for (const how of /** @type {const} */ (['mouse', 'touch', 'gamepad', 'tv'])) {
+      empty.setHint(how, 0);
+      o.setHint(how, 0);
+      assert.doesNotMatch(empty.hint.textContent, /picture/, how);
+      assert.match(o.hint.textContent, /a picture/, how);
+    }
+    assert.equal(empty.hint.textContent.split('\n')[0], 'Arrows: walk and turn · OK: the doorway or the panel in the middle · Menu or hold Back: settings and the shared session');
+    assert.match(o.hint.textContent, /^Arrows: walk and turn · OK: the doorway, a picture or the panel in the middle · Menu or hold Back: /);
+    // The dot on one: where its link goes, else up to it; off it, the hint as it was.
+    o.setAimed(1);
+    assert.match(o.hint.textContent, /^Arrows: walk and turn · OK: The studio · Menu or hold Back: .*\nWith TalkBack: /);
+    o.setAimed(0);
+    assert.match(o.hint.textContent, / · OK: walk up to Still life · /);
+    o.setAimed(-1);
+    assert.match(o.hint.textContent, / · OK: the doorway, a picture or the panel in the middle · /);
+    // Faded, the hint comes back for a piece, stays from one to the next, and fades when the dot leaves.
+    o.hideHint();
+    o.setAimed(1);
+    assert.ok(!o.hint.classList.contains('gone') && o.hint.getAttribute('aria-hidden') === null);
+    o.setAimed(2);
+    assert.match(o.hint.textContent, / · OK: walk up to Low · /);
+    assert.ok(!o.hint.classList.contains('gone'));
+    o.setAimed(-1);
+    assert.ok(o.hint.classList.contains('gone') && o.hint.getAttribute('aria-hidden') === 'true');
+    assert.match(o.hint.textContent, / · OK: the doorway, a picture or the panel in the middle · /, 'still the view’s description');
+    // In the card, its own hint, whatever the dot was on.
+    o.setHint('tv-card', 0);
+    o.setAimed(1);
+    assert.match(o.hint.textContent, /Back: walk again$/);
+  } finally {
+    remove();
+  }
+});
+
 test("a piece's link: where it leads, with the way back named for the room, and back in front of it, the kept way back kept", () => {
   const here = 'https://ariamokr.github.io/art/?room=k3vd-q8hn&tv=emulate';
   const url = new URL(hallLink({ id: 'studio', url: PIECES[1].link }, { here, name: 'Art', room: 'k3vd-q8hn' }));
