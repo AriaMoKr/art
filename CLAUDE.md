@@ -72,7 +72,9 @@ Node 22 or newer; CI runs Node 24 (common's Pages workflow). It runs under MSYS2
   buttons (`PANEL_BUTTONS`, `panelButtonAt`). What hangs on the walls: `PIECE` (frame, label),
   `PIECE_WALLS`, the layout's `pieces` (each where it hangs: `along`, its middle, the wall's normal
   `nx`/`nz`, its right `rx`/`rz`, its label), `pieceFront` (where to stand to look),
-  `pieceSpawn` (back from its link) and `pieceProblems` (what is wrong, in words).
+  `pieceSpawn` (back from its link) and `pieceProblems` (what is wrong, in words). Its types:
+  `Layout` (layoutRoom's, which the rest take) and `RoomHit` (what castRay writes: common's `Hit`
+  with `u`, `v` and `piece`).
   Coordinates: metres, the doorway's wall at z = 0, the room along -z, the doorway at x = 0, yaw 0
   faces -z, left is -x.
 - `scene.js` builds the room as a few merged meshes with light baked into vertex colours (`bake.js`
@@ -83,15 +85,20 @@ Node 22 or newer; CI runs Node 24 (common's Pages workflow). It runs under MSYS2
   (`loadPictures`, its title from `pictureFallback` until loaded), and the labels as one mesh on
   `labelAtlas`. `textures.js`: canvas textures, seeded, nearly white so the config's colours are
   the room's.
-- `controls.js`: the hallway's and outside's controls for a box room: drag to look, keys, click or
-  tap the floor (`walkTo`), the doorway (`onDoor`, `walkInto`), the panel (`onPanel`), a piece
-  (`onPiece`, `hoverPiece`; `walkUpTo(i, done)`, a teleport in VR), a gamepad
-  (common's `gamepad.js`), and in VR the sticks per common's `nav.js` (move smooth/teleport, turn
-  snap/smooth), the trigger, a grip (`onSqueeze`); `reduceMotion` makes walks jumps, `setEyeLift`
-  raises the rig in VR (seated), `moveSpeed`/`turnRate` feed the vignette. Keys go through common's
-  `tv.js` `keyOf` (a TV remote's come with no `code`); `aimMiddle` makes the middle of the view the
-  pointer (on a TV) and `useMiddle()` uses it (a gamepad's A, the remote's OK). Nothing allocated
-  per frame.
+- `controls.js`: a subclass of common's `Controls` (`common/controls.js`) for a `RoomHit`. Common's
+  is the walking on every device: drag to look, keys through `tv.js` `keyOf` (a TV remote's come
+  with no `code`; a key a page control has used, or one in a form control or a `data-own-keys`
+  element, is the page's), click or tap (two fingers neither look nor tap), a gamepad
+  (`gamepad.js`), and in VR the trigger, a grip (`onSqueeze`) and the sticks per `nav.js` (move
+  smooth/teleport, turn snap/smooth); `walkTo(x, z, { face, then })` on the floor,
+  `onDoor(how, hit)` on the doorway, `reduceMotion` (a walk jumps to its end), `setEyeLift`
+  (seated), `moveSpeed`/`turnRate` (the vignette), `aimMiddle` and `useMiddle()` (a gamepad's A,
+  the remote's OK); nothing allocated per frame. The room's: `layout` (set after `super()`),
+  `castRay` and `clampWalk` (room.js's on it; the hit's `u`, `v` and `piece` through the `hit`
+  option), the panel (`onPanel`, `hoverPanel`, `_press`) and the pieces (`onPiece`, `hoverPiece`,
+  a reticle at 1.3) in `usable`, `use`, `_setHover` and `reticleScale`, then `super`'s; `walkInto`
+  (`_startWalk` with `turn` false: facing the doorway from the first step) and `walkUpTo(i, done)`
+  (a teleport in VR).
 - `panel.js`: the control panel on the wall (outside's), redrawn only on a change. `overlay.js`: the
   card (the page's `<nav>`: the title, ← Hallway, the description, On the walls (a link to where
   each piece leads, `pieceHref`, else a button, `onPiece`), Start / Leave shared session, in
@@ -132,10 +139,11 @@ Node 22 or newer; CI runs Node 24 (common's Pages workflow). It runs under MSYS2
   rather than skips without TypeScript. What TypeScript's DOM library leaves out (WebKit's
   fullscreen names, `window.__room`, `window.roomXrGranted`) is in `types/globals.d.ts`, never
   served. `strict` comes a file at a time: `tsconfig.strict.json` (it, with `strict` on) includes
-  only the files that pass it, `config.js` and `presence.js` so far, and `test/types.test.js` runs
-  it too. A file joins its `include` when a change makes it pass; what an included file imports is
-  checked strictly with it. The rest has a few hundred errors with it, nearly all untyped
-  parameters. `tools/` and `test/` wait for `@types/node`.
+  only the files that pass it, `config.js`, `presence.js`, `room.js` and `controls.js` so far, and
+  `test/types.test.js` runs it too. A file joins its `include` when a change makes it pass; what an
+  included file imports is checked strictly with it. The rest has a few hundred errors with it,
+  mostly untyped parameters and values that may be null (a canvas's 2D context). `tools/` and
+  `test/` wait for `@types/node`.
 - Scripted testing: `window.__room` (THREE, renderer, scene, camera, rig, room, layout, controls,
   overlay, fade, vignette, xrDevice, go, enterVR, together, remote, tv, way, visit, setAccess, access,
   `preview()`, `social()`, `tick(dt, n)`, `ready`, true once the pieces' pictures have loaded or
@@ -156,8 +164,8 @@ Node 22 or newer; CI runs Node 24 (common's Pages workflow). It runs under MSYS2
   (a localhost URL goes over adb reverse); the empty room holds 60 fps at 1080p at a pixel ratio of
   2, the budget a room's contents can spend. Other sessions may use the same TV: don't restart its
   app under them.
-- Shared packages, pinned by tag in package.json: AriaMoKr/common (`v0.6.3`: the door contract,
-  nav, access with the vignette, fade, gamepad, portal, sky, tv, and the tools `serve.mjs`,
-  `vendor.mjs`, `chrome.mjs`, and the Pages workflow) and AriaMoKr/layersharedsession (`v0.3.0`).
-  Change them there, then move the tag here and `npm install`.
+- Shared packages, pinned by tag in package.json: AriaMoKr/common (`v0.7.1`: the door contract,
+  nav, access with the vignette, fade, gamepad, portal, sky, tv, controls, and the tools
+  `serve.mjs`, `vendor.mjs`, `chrome.mjs`, and the Pages workflow) and AriaMoKr/layersharedsession
+  (`v0.3.0`). Change them there, then move the tag here and `npm install`.
 - `.claude/launch.json`: `room` (8096) and `hallway` (`../hallway/public` on 8088).
